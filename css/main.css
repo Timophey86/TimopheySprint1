@@ -1,0 +1,32 @@
+.game-table {
+    border: 2px solid black;
+    height: 160px;
+    width: 160px;
+}
+
+.table {
+    background-color: grey;
+}
+td {
+    text-align: center;
+    border: 2px solid black;
+    height: 30px;
+    width: 30px;
+}
+
+.game-over {
+    height: 50px;
+    width: 150px;
+    text-align: center;
+    display: none;
+    border: 2px solid black;
+}
+
+.isShown {
+    background-color: #e8eae6 ;
+}
+
+.Mine.isShown {
+    background-color: red;
+}
+
