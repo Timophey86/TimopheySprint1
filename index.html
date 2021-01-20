@@ -6,12 +6,13 @@
     <link rel="stylesheet" href="css/main.css">
     <title>Minesweeper</title>
 </head>
-<body>
-    <div class="game-over"></div>
+<body onload="init()">
+    <div class="game-over" onclick="init()"></div>
     <table class="game-table">
         <tbody class="table">
         </tbody>
     </table>
+    <div class="timer">00</div>
     <script src="js/main.js"></script>
 </body>
 </html>

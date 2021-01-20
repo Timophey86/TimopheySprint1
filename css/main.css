@@ -15,7 +15,7 @@ td {
 }
 
 .game-over {
-    height: 50px;
+    height: 60px;
     width: 150px;
     text-align: center;
     display: none;
@@ -30,3 +30,12 @@ td {
     background-color: red;
 }
 
+.timer {
+    height: 20px;
+    width: 20px;
+    border: 1px solid black;
+    padding: 5px;
+    text-align: center;
+    margin-top: 5px;
+    margin-left: 70px;
+}

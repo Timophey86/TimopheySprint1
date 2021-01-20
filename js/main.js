@@ -34,49 +34,57 @@ var gGame = {
   markedCount: 0,
   secsPassed: 0,
 };
-
 var gBoard;
-//INIT NOT WORKING PROPERLY**
-init();
+var timerInterval
+
+
+//Initializing function ****NOT WORKING PROPERLY ONLOAD**
+function init() {
+    gBoard =createBoard(4)
+    getRandomBombs(gBoard);
+    renderBoard(gBoard);
+    gGame.secsPassed = 0
+    gGame.shownCount = 0
+    gGame.markedCount = 0
+    gGame.isOn = true
+    timerInterval = setInterval(() => {
+        timer();
+      }, 1000);      
+    var elGameOver = document.querySelector(".game-over")
+    elGameOver.style.display = "none"
+}
+
 
 
 //Get bombs in random location
-getRandomBombs(gBoard);
 function getRandomBombs(board) {
-  var amount = gLevel.easy.bombs;
-  for (var i = 0; i < amount; i++) {
-    var randomI = getRandomIntInclusive(0, board.length - 1);
-    var randomJ = getRandomIntInclusive(0, board.length - 1);
-    gBoard[randomI][randomJ].isMine = true;
-    console.log(gBoard[randomI][randomJ]);
-  }
+    var amount = gLevel.easy.bombs;
+    for (var i = 0; i < amount; i++) {
+        var randomI = getRandomIntInclusive(0, board.length - 1);
+        var randomJ = getRandomIntInclusive(0, board.length - 1);
+        gBoard[randomI][randomJ].isMine = true;
+        console.log(gBoard[randomI][randomJ]);
+    }
 }
 
 //Create board function
 function createBoard(size) {
-  var board = [];
-  for (var i = 0; i < size; i++) {
-    board.push([]);
-    for (var j = 0; j < size; j++) {
-      //Clone cell objects without referencing them
-      var cloneCell = {};
-      for (let key in cell) {
-        cloneCell[key] = cell[key];
-      }
-      board[i].push(cloneCell);
+    var board = [];
+    for (var i = 0; i < size; i++) {
+        board.push([]);
+        for (var j = 0; j < size; j++) {
+            //Clone cell objects without referencing them
+            var cloneCell = {};
+            for (let key in cell) {
+                cloneCell[key] = cell[key];
+            }
+            board[i].push(cloneCell);
+        }
     }
-  }
-  return board;
+    return board;
 }
 
-//Initializing function ****NOT WORKING PROPERLY ONLOAD**
-function init() {
-  gBoard = createBoard(4);
-  //Render the board
-  renderBoard(gBoard);
-}
 
-renderBoard(gBoard);
 
 //Render Board
 function renderBoard(board) {
@@ -96,8 +104,6 @@ function renderBoard(board) {
   elContainer.innerHTML = strHTML;
 }
 
-//Console log the board
-console.log(gBoard);
 
 //Count mines around each cell and set the cell's minesAroundCount.
 function setMinesNegsCount(elCell, board) {
@@ -122,17 +128,23 @@ function cellClicked(elCell, i, j) {
   if (!gGame.isOn) {
     return;
   }
+  if (elCell.classList.contains("Marked")) {
+    return;
+  }
   if (!gBoard[i][j].isShown) {
     gBoard[i][j].isShown = true;
     elCell.classList.add("isShown");
     if (gBoard[i][j].isShown && !gBoard[i][j].isMine) {
-        setMinesNegsCount(elCell, gBoard);
-        gGame.shownCount++
+      setMinesNegsCount(elCell, gBoard);
+      gGame.shownCount++;
+      console.log(gGame.shownCount);
     } else if (gBoard[i][j].isShown && gBoard[i][j].isMine) {
       elCell.innerHTML = MINE;
       gameOver();
     }
   }
+  //Check for victory
+  isVictorious();
 }
 
 //Right mouse click to mark the cell
@@ -147,13 +159,37 @@ function cellMarked(elCell) {
     gBoard[idxI][idxJ].isMarked = false;
     elCell.innerHTML = "";
   }
+  //Check if marked cell contains a bomb
+  if (gBoard[idxI][idxJ].isMine) {
+    gGame.markedCount++;
+    console.log(gGame.markedCount);
+  }
+  //Check for victory
+  isVictorious();
 }
 
+//Check if victory
+function isVictorious() {
+  var gameOver = document.querySelector(".game-over");
+  if (
+    gGame.markedCount === gLevel.easy.bombs &&
+    gGame.shownCount === gLevel.easy.size ** 2 - gLevel.easy.bombs
+  ) {
+    gameOver.style.display = "block";
+    gameOver.innerHTML = "Congratulations! Victory is yours.\n Press to restat";
+    clearInterval(timerInterval);
+  }
+}
+
+//Game over function
 function gameOver() {
   var gameOver = document.querySelector(".game-over");
   gameOver.style.display = "block";
   gameOver.innerHTML = "Game over! Press to try again.";
   gGame.isOn = false;
+  gGame.shownCount = 0;
+  gGame.markedCount = 0;
+  clearInterval(timerInterval);
 }
 
 //Get random num inclusive
@@ -167,3 +203,16 @@ function getRandomIntInclusive(min, max) {
 document.addEventListener("contextmenu", function (element) {
   element.preventDefault();
 });
+
+
+//Timer function
+function timer() {
+    gGame.secsPassed++;
+    var elTimer = document.querySelector(".timer");
+    if (gGame.secsPassed < 10) {
+        elTimer.innerHTML = "0" + gGame.secsPassed;
+      } else {
+          elTimer.innerHTML = gGame.secsPassed;
+      }
+  }
+  
