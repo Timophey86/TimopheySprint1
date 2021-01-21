@@ -1,7 +1,7 @@
 .game-table {
     border: 2px solid black;
-    height: 160px;
-    width: 160px;
+    height: auto;
+    width: auto;
 }
 
 .table {
@@ -15,11 +15,16 @@ td {
 }
 
 .game-over {
-    height: 60px;
+    height: 20px;
     width: 150px;
     text-align: center;
     display: none;
-    border: 2px solid black;
+    /* border: 2px solid black; */
+}
+
+.smiley {
+    margin-top: 20px;
+    font-size: xx-large;
 }
 
 .isShown {
@@ -39,3 +44,9 @@ td {
     margin-top: 5px;
     margin-left: 70px;
 }
+
+.lives-count {
+    font-size: small;
+    margin: 2px 0px 2px 4px;
+}
+
