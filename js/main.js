@@ -43,28 +43,34 @@ var timerInterval;
 var isFirstCellClicked = false;
 //Lives going to be determined by the level
 var gLives;
+var selectedLevel = gLevel.easy;
 
 //Levels onclick function
 function chooseLevel(elLevel) {
   if (elLevel.classList.contains("Easy")) {
+selectedLevel = gLevel.easy;  
     gBoard = createBoard(gLevel.easy.size);
-    getRandomBombs(gBoard, elLevel);
     renderBoard(gBoard);
     gLives = 2;
-    renderLivesCount();
+    var elSmiley = document.querySelector(".smiley");
+    elSmiley.innerHTML = PLAY;
   } else if (elLevel.classList.contains("Medium")) {
+selectedLevel = gLevel.medium;  
     gBoard = createBoard(gLevel.medium.size);
-    getRandomBombs(gBoard, elLevel);
     renderBoard(gBoard);
     gLives = 3;
-    renderLivesCount();
+    var elSmiley = document.querySelector(".smiley");
+    elSmiley.innerHTML = PLAY;
   } else {
+selectedLevel = gLevel.hard;  
     gBoard = createBoard(gLevel.hard.size);
-    getRandomBombs(gBoard, elLevel);
     renderBoard(gBoard);
     gLives = 3;
-    renderLivesCount();
+    var elSmiley = document.querySelector(".smiley");
+    elSmiley.innerHTML = PLAY;
   }
+  renderLivesCount();
+  isFirstCellClicked = false;
 }
 
 //Render levels
@@ -79,11 +85,8 @@ function renderLevels() {
 //Initializing function
 function init() {
   renderLevels();
-  gBoard = createBoard(4);
-  getRandomBombs(gBoard);
-  renderBoard(gBoard);
-  gLives = 2;
-  renderLivesCount();
+  var defaultLevel = document.querySelector(".Easy");
+  chooseLevel(defaultLevel);
   var elTimer = document.querySelector(".timer");
   elTimer.innerHTML = "00";
   gGame.secsPassed = 0;
@@ -92,28 +95,31 @@ function init() {
   gGame.isOn = true;
   var elGameOver = document.querySelector(".game-over");
   elGameOver.style.display = "none";
-  isFirstCellClicked = false;
+  //isFirstCellClicked = false;
   var elSmiley = document.querySelector(".smiley");
   elSmiley.innerHTML = PLAY;
 }
 
 //Get bombs in random location
-function getRandomBombs(board, elLevel) {
+function getRandomBombs(board) {
   var amount = 0;
-  if (!elLevel || elLevel.classList.contains("Easy")) {
+  if (selectedLevel === gLevel.easy) {
     amount = gLevel.easy.bombs;
-    renderBoard(board);
-  } else if (elLevel.classList.contains("Medium")) {
+  } else if (selectedLevel === gLevel.medium) {
     amount = gLevel.medium.bombs;
-    renderBoard(board);
   } else {
-    amount = gLevel.medium.bombs;
-    renderBoard(board);
+    amount = gLevel.hard.bombs;
   }
   for (var i = 0; i < amount; i++) {
     var randomI = getRandomIntInclusive(0, board.length - 1);
     var randomJ = getRandomIntInclusive(0, board.length - 1);
+if(gBoard[randomI][randomJ].isMine || gBoard[randomI][randomJ].isShown) {
+i--;
+continue;
+}
     gBoard[randomI][randomJ].isMine = true;
+var elContainer = document.getElementById(`${randomI}+${randomJ}`);
+elContainer.classList.add("Mine");
   }
 }
 
@@ -140,11 +146,7 @@ function renderBoard(board) {
   for (var i = 0; i < board.length; i++) {
     strHTML += "<tr>";
     for (var j = 0; j < board[0].length; j++) {
-      if (board[i][j].isMine) {
-        strHTML += `<td id="${i}+${j}" data-i="${i}" data-j="${j}" class="cell Mine"  onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)"></td>`;
-      } else {
-        strHTML += `<td id="${i}+${j}" data-i="${i}" data-j="${j}" class="cell empty" onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)"></td>`;
-      }
+        strHTML += `<td id="${i}+${j}" data-i="${i}" data-j="${j}" class="cell" onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)"></td>`;
     }
   }
   strHTML += "</tr>";
@@ -186,12 +188,13 @@ function cellClicked(elCell, i, j) {
   if (!gBoard[i][j].isShown) {
     gBoard[i][j].isShown = true;
     elCell.classList.add("isShown");
-    //Check if the clicked cell is the first cell
+    //Check if the clicked cell is the first cell place bombs on first click
     if (!isFirstCellClicked) {
       timerInterval = setInterval(() => {
         timer();
       }, 1000);
       isFirstCellClicked = true;
+ getRandomBombs(gBoard);
     }
     if (gBoard[i][j].isShown && !gBoard[i][j].isMine) {
       setMinesNegsCount(elCell, gBoard);

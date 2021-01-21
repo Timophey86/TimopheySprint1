@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/main.css" />
     <title>Minesweeper</title>
-</head>
-<body onload="init()">
-    <div class="game-over"></div>
-    <div class="smiley" onclick="init()"></div>
-    <div class="levels"></div>
-    <div class="lives-count"></div>
-    <table class="game-table">
-        <tbody class="table">
-        </tbody>
-    </table>
-    <div class="timer">00</div>
+  </head>
+  <body onload="init()">
+    <div class="container">
+      <h2>Let's play Minesweeper!</h2>
+      <div class="game-over"></div>
+      <div class="smiley" onclick="init()"></div>
+      <div class="levels"></div>
+      <div class="lives-count"></div>
+      <table class="game-table">
+        <tbody class="table"></tbody>
+      </table>
+      <div class="timer">00</div>
+    </div>
     <script src="js/main.js"></script>
-</body>
+  </body>
 </html>

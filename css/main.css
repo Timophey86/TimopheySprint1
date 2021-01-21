@@ -1,52 +1,65 @@
+.container {
+  height: 500px;
+  width: 500px;
+  background-color: #f7f7e8;
+  padding: 50px 100px 200px 50px;
+  text-align: center;
+}
+
 .game-table {
-    border: 2px solid black;
-    height: auto;
-    width: auto;
+  margin: auto;
+  border: 2px solid black;
+  height: auto;
+  width: auto;
 }
 
 .table {
-    background-color: grey;
+  background-color: grey;
 }
 td {
-    text-align: center;
-    border: 2px solid black;
-    height: 30px;
-    width: 30px;
+  text-align: center;
+  border: 2px solid black;
+  height: 30px;
+  width: 30px;
 }
 
 .game-over {
-    height: 20px;
-    width: 150px;
-    text-align: center;
-    display: none;
-    /* border: 2px solid black; */
+  height: 20px;
+  width: 150px;
+  display: none;
+  margin: auto;
+
 }
 
 .smiley {
-    margin-top: 20px;
-    font-size: xx-large;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: xx-large;
 }
 
 .isShown {
-    background-color: #e8eae6 ;
+  background-color: #e8eae6;
 }
 
 .Mine.isShown {
-    background-color: red;
+  background-color: red;
 }
 
 .timer {
-    height: 20px;
-    width: 20px;
-    border: 1px solid black;
-    padding: 5px;
-    text-align: center;
-    margin-top: 5px;
-    margin-left: 70px;
+  height: 20px;
+  width: 20px;
+  border: 1px solid black;
+  padding: 5px;
+  text-align: center;
+  margin: auto;
+  margin-top: 5px;
 }
 
 .lives-count {
-    font-size: small;
-    margin: 2px 0px 2px 4px;
+  font-size: medium;
+  margin-bottom: 10px;
 }
 
+.levels {
+  margin-bottom: 5px;
+}
