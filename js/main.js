@@ -44,34 +44,67 @@ var isFirstCellClicked = false;
 //Lives going to be determined by the level
 var gLives;
 var selectedLevel = gLevel.easy;
+var timeoutVar;
+var bombHints = [];
+var bombLoc;
+//Clear local storage on restart
+localStorage.clear();
 
 //Levels onclick function
 function chooseLevel(elLevel) {
   if (elLevel.classList.contains("Easy")) {
-selectedLevel = gLevel.easy;  
+    selectedLevel = gLevel.easy;
     gBoard = createBoard(gLevel.easy.size);
     renderBoard(gBoard);
     gLives = 2;
+    hideHintBtns();
+    resetTimer();
     var elSmiley = document.querySelector(".smiley");
     elSmiley.innerHTML = PLAY;
+    //Display best score per level
+    var elBestScore = document.querySelector(".best-score")
+    if (!localStorage.getItem("Best Score: Easy Mode")) {
+      elBestScore.innerHTML = "No best score at this level yet.."
+    } else {elBestScore.innerHTML = `Your best score at the <span>Easy</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Easy Mode"
+    )} secs`;}
   } else if (elLevel.classList.contains("Medium")) {
-selectedLevel = gLevel.medium;  
+    selectedLevel = gLevel.medium;
     gBoard = createBoard(gLevel.medium.size);
     renderBoard(gBoard);
+    hideHintBtns();
+    resetTimer();
     gLives = 3;
     var elSmiley = document.querySelector(".smiley");
     elSmiley.innerHTML = PLAY;
+    //Display best score per level
+    var elBestScore = document.querySelector(".best-score")
+    if (!localStorage.getItem("Best Score: Medium Mode")) {
+      elBestScore.innerHTML = "No best score at this level yet.."
+    } else {elBestScore.innerHTML = `Your best score at the <span>Medium</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Medium Mode"
+    )} secs`;}
   } else {
-selectedLevel = gLevel.hard;  
+    selectedLevel = gLevel.hard;
     gBoard = createBoard(gLevel.hard.size);
     renderBoard(gBoard);
+    hideHintBtns();
+    resetTimer();
     gLives = 3;
     var elSmiley = document.querySelector(".smiley");
     elSmiley.innerHTML = PLAY;
+    //Display best score per level
+    var elBestScore = document.querySelector(".best-score")
+    if (!localStorage.getItem("Best Score: Hard Mode")) {
+      elBestScore.innerHTML = "No best score at this level yet.."
+    }else {elBestScore.innerHTML = `Your best score at the <span>Hard</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Hard Mode"
+    )} secs`;}
   }
   renderLivesCount();
   isFirstCellClicked = false;
 }
+
 
 //Render levels
 function renderLevels() {
@@ -87,17 +120,14 @@ function init() {
   renderLevels();
   var defaultLevel = document.querySelector(".Easy");
   chooseLevel(defaultLevel);
-  var elTimer = document.querySelector(".timer");
-  elTimer.innerHTML = "00";
-  gGame.secsPassed = 0;
-  gGame.shownCount = 0;
-  gGame.markedCount = 0;
+  resetTimer();
   gGame.isOn = true;
   var elGameOver = document.querySelector(".game-over");
   elGameOver.style.display = "none";
   //isFirstCellClicked = false;
   var elSmiley = document.querySelector(".smiley");
   elSmiley.innerHTML = PLAY;
+  hideHintBtns();
 }
 
 //Get bombs in random location
@@ -113,13 +143,16 @@ function getRandomBombs(board) {
   for (var i = 0; i < amount; i++) {
     var randomI = getRandomIntInclusive(0, board.length - 1);
     var randomJ = getRandomIntInclusive(0, board.length - 1);
-if(gBoard[randomI][randomJ].isMine || gBoard[randomI][randomJ].isShown) {
-i--;
-continue;
-}
+    if (gBoard[randomI][randomJ].isMine || gBoard[randomI][randomJ].isShown) {
+      i--;
+      continue;
+    }
     gBoard[randomI][randomJ].isMine = true;
-var elContainer = document.getElementById(`${randomI}+${randomJ}`);
-elContainer.classList.add("Mine");
+    //Get hints to hint array
+    bombLoc = {};
+    bombHints.push((bombLoc = { i: randomI, j: randomJ }));
+    var elContainer = document.getElementById(`${randomI}+${randomJ}`);
+    elContainer.classList.add("Mine");
   }
 }
 
@@ -146,7 +179,7 @@ function renderBoard(board) {
   for (var i = 0; i < board.length; i++) {
     strHTML += "<tr>";
     for (var j = 0; j < board[0].length; j++) {
-        strHTML += `<td id="${i}+${j}" data-i="${i}" data-j="${j}" class="cell" onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)"></td>`;
+      strHTML += `<td id="${i}+${j}" data-i="${i}" data-j="${j}" class="cell" onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)"></td>`;
     }
   }
   strHTML += "</tr>";
@@ -173,8 +206,42 @@ function setMinesNegsCount(elCell, board) {
   //Display the mines around the clicked cell
   board[idxI][idxJ].minesAroundCount = tempMineCount;
   elCell.innerHTML = board[idxI][idxJ].minesAroundCount;
-  console.log(tempMineCount);
   return tempMineCount;
+}
+
+//Get hints for bomb loacations
+function showBombLocation(elHint) {
+  var randomNum = getRandomIntInclusive(0, bombHints.length - 1);
+  var singleHint = bombHints[randomNum];
+  bombHints.splice(randomNum, 1);
+  //Get element by co-ords
+  var elBombLoc = document.getElementById(`${singleHint.i}+${singleHint.j}`);
+  elBombLoc.classList.add("hint");
+  setTimeout(function () {
+    removeClass(elBombLoc, "hint");
+  }, 1000);
+  elHint.style.display = "none";
+}
+
+//Render hint buttons
+function renderHints() {
+  var elButtons = document.querySelector(".bomb-hints");
+  elButtons.style.display = "block";
+  var strHTML = "";
+  for (var i = 0; i < bombHints.length / 2; i++) {
+    console.log("hi");
+    strHTML += `<button class="${i}" onclick="showBombLocation(this)">Hint</button>`;
+  }
+  var elHints = document.querySelector(".bomb-hints");
+  elHints.innerHTML = strHTML;
+}
+//Rerender the hint buttons on game start
+function hideHintBtns() {
+  var elButtons = document.querySelector(".bomb-hints");
+  if (elButtons.innerHTML) {
+    elButtons.innerHTML = "";
+  }
+  bombHints = [];
 }
 
 //Left mouse cell click
@@ -194,7 +261,9 @@ function cellClicked(elCell, i, j) {
         timer();
       }, 1000);
       isFirstCellClicked = true;
- getRandomBombs(gBoard);
+      //Random bombs and hints appear on first click
+      getRandomBombs(gBoard);
+      renderHints();
     }
     if (gBoard[i][j].isShown && !gBoard[i][j].isMine) {
       setMinesNegsCount(elCell, gBoard);
@@ -205,6 +274,9 @@ function cellClicked(elCell, i, j) {
       elCell.innerHTML = MINE;
       gLives--;
       if (gLives > 0) {
+        timeoutVar = setTimeout(function () {
+          removeClass(elCell, "isShown", true);
+        }, 600);
         var elSmiley = document.querySelector(".smiley");
         elSmiley.innerHTML = ONMINE;
         renderLivesCount();
@@ -226,17 +298,25 @@ function cellMarked(elCell) {
   elCell.classList.toggle("Marked");
   var idxI = +elCell.dataset.i;
   var idxJ = +elCell.dataset.j;
+
+  if (gBoard[idxI][idxJ].isShown) return;
+
   if (!gBoard[idxI][idxJ].isMarked) {
     gBoard[idxI][idxJ].isMarked = true;
     elCell.innerHTML = FLAG;
+    //Check if marked cell contains a bomb
+    if (gBoard[idxI][idxJ].isMine) {
+      gGame.markedCount++;
+      console.log(gGame.markedCount);
+    }
   } else {
     gBoard[idxI][idxJ].isMarked = false;
     elCell.innerHTML = "";
-  }
-  //Check if marked cell contains a bomb
-  if (gBoard[idxI][idxJ].isMine) {
-    gGame.markedCount++;
-    console.log(gGame.markedCount);
+    //Check if marked cell contains a bomb
+    if (gBoard[idxI][idxJ].isMine) {
+      gGame.markedCount--;
+      console.log(gGame.markedCount);
+    }
   }
   //Check for victory
   isVictorious();
@@ -246,15 +326,17 @@ function cellMarked(elCell) {
 function isVictorious() {
   var gameOver = document.querySelector(".game-over");
   if (
-    gGame.markedCount === gLevel.easy.bombs &&
-    gGame.shownCount === gLevel.easy.size ** 2 - gLevel.easy.bombs
+    gGame.markedCount === selectedLevel.bombs &&
+    gGame.shownCount === selectedLevel.size ** 2 - selectedLevel.bombs
   ) {
     gameOver.style.display = "block";
     gameOver.innerHTML =
-      "Congratulations! Victory is yours.\n Press smiley to restat";
+      "Congratulations!\n Victory is yours. Press smiley to restat";
     clearInterval(timerInterval);
     var elSmiley = document.querySelector(".smiley");
     elSmiley.innerHTML = WIN;
+    console.log(gGame.secsPassed);
+    setBestScore();
   }
 }
 
@@ -286,9 +368,9 @@ function timer() {
   gGame.secsPassed++;
   var elTimer = document.querySelector(".timer");
   if (gGame.secsPassed < 10) {
-    elTimer.innerHTML = "0" + gGame.secsPassed;
+    elTimer.innerHTML = "Timer: 0" + gGame.secsPassed + " secs";
   } else {
-    elTimer.innerHTML = gGame.secsPassed;
+    elTimer.innerHTML = "Timer " + gGame.secsPassed + " secs";
   }
 }
 
@@ -319,4 +401,62 @@ function expandShown(board, elCell, i, j) {
 function renderLivesCount() {
   var elLives = document.querySelector(".lives-count");
   elLives.innerHTML = `You've got ${gLives} lives left`;
+}
+
+//Assist function to remove a class from an element and check if mine in case we have to reset
+function removeClass(elElement, className, isBomb) {
+  elElement.classList.remove(className);
+  var idxI = +elElement.dataset.i;
+  var idxJ = +elElement.dataset.j;
+  elElement.innerHTML = "";
+  //If the removed class is a bomb change the isShown so it can be clicked again
+  if (isBomb) {
+    gBoard[idxI][idxJ].isShown = false;
+  }
+}
+
+//Reset Timer
+function resetTimer() {
+  clearInterval(timerInterval);
+  var elTimer = document.querySelector(".timer");
+  elTimer.innerHTML = "Let's start sweeping!";
+  gGame.secsPassed = 0;
+  gGame.shownCount = 0;
+  gGame.markedCount = 0;
+}
+
+//Log best score
+function setBestScore() {
+  var elBestScore = document.querySelector(".best-score");
+  if (selectedLevel === gLevel.easy) {
+    if (
+      localStorage.getItem("Best Score: Easy Mode") > gGame.secsPassed ||
+      !localStorage.getItem("Best Score: Easy Mode")
+    ) {
+      localStorage.setItem("Best Score: Easy Mode", gGame.secsPassed);
+    }
+    elBestScore.innerHTML = `Your best score at the <span>Easy</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Easy Mode"
+    )} secs`;
+  } else if (selectedLevel === gLevel.medium) {
+    if (
+      localStorage.getItem("Best Score: Medium Mode") > gGame.secsPassed ||
+      !localStorage.getItem("Best Score: Medium Mode")
+    ) {
+      localStorage.setItem("Best Score: Medium Mode", gGame.secsPassed);
+    }
+    elBestScore.innerHTML = `Your best score at the <span>Medium</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Medium Mode"
+    )} secs`;
+  } else {
+    if (
+      localStorage.getItem("Best Score: Hard Mode") > gGame.secsPassed ||
+      !localStorage.getItem("Best Score: Hard Mode")
+    ) {
+      localStorage.setItem("Best Score: Hard Mode", gGame.secsPassed);
+    }
+    elBestScore.innerHTML = `Your best score at the <span>Hard</span> level \n so far is ${localStorage.getItem(
+      "Best Score: Hard Mode"
+    )} secs`;
+  }
 }

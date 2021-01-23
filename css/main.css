@@ -1,7 +1,11 @@
+body {
+  background-color: #f7f7e8;
+}
+
 .container {
+  margin: auto;
   height: 500px;
   width: 500px;
-  background-color: #f7f7e8;
   padding: 50px 100px 200px 50px;
   text-align: center;
 }
@@ -24,11 +28,13 @@ td {
 }
 
 .game-over {
+  position: relative;
+  bottom: 13px;
   height: 20px;
   width: 150px;
+  margin-bottom: 20px;
   display: none;
   margin: auto;
-
 }
 
 .smiley {
@@ -46,9 +52,8 @@ td {
 }
 
 .timer {
-  height: 20px;
-  width: 20px;
-  border: 1px solid black;
+  height: 40px;
+  width: 100px;
   padding: 5px;
   text-align: center;
   margin: auto;
@@ -62,4 +67,25 @@ td {
 
 .levels {
   margin-bottom: 5px;
+}
+
+.hint {
+  background-color: #fde8cd;
+}
+
+.bomb-hints {
+  margin-top: 5px;
+}
+
+.best-score {
+  font-size: medium;
+}
+
+span {
+  color: #00917c;
+}
+
+.bomb-hints button {
+  background-color: #ffd56b;
+  border: 1px solid #ee9595;
 }
