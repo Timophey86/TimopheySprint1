@@ -4,22 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/main.css" />
-    <title>Minesweeper</title>
+    <title>My Book Store</title>
+    <script
+      src="https://kit.fontawesome.com/49ec2f22e7.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body onload="init()">
-    <div class="container">
-      <h2>Let's play Minesweeper!</h2>
-      <div class="game-over"></div>
-      <div class="smiley" onclick="init()"></div>
-      <div class="levels"></div>
-      <div class="lives-count"></div>
-      <table class="game-table">
-        <tbody class="table"></tbody>
-      </table>
-      <div class="bomb-hints"></div>
-      <div class="timer"></div>
-      <div class="best-score"></div>
-    </div>
-    <script src="js/main.js"></script>
+    <section class="sort-by">
+      <h3 data-trans="sort">Sort By</h3>
+      <select onchange="onSortTable(event)" name="sortBy">
+        <!-- <option>Title Name</option>
+            <option>Author Name</option>
+            <option>Price</option> -->
+        <option data-trans="title">Title Name</option>
+        <option data-trans="author-name">Author Name</option>
+        <option data-trans="price">Price</option>
+      </select>
+    </section>
+    <section class="select-language">
+      <h3 data-trans="select-language">Select Language</h3>
+      <select onchange="onSetLang(this.value)">
+        <option value="en">English</option>
+        <option value="he">עברית</option>
+      </select>
+    </section>
+    <div class="table-container"></div>
+    <div data-trans="add" class="add-book" onclick="onAddBook()">Add Book</div>
+    <button
+      data-trans="previous"
+      class="page-select previous-page"
+      onclick="onPreviousPage()"
+    >
+      Previous Page
+    </button>
+    <button
+      data-trans="next"
+      class="page-select next-page"
+      onclick="onNextPage()"
+    >
+      Next Page
+    </button>
+    <section class="add-manually">
+      <h3 data-trans="enter-manually" class="enter-book">Enter Book Manually:</h3>
+      <div class="add-title-name">
+        <h4 data-trans="title-name">Title name:</h4>
+        <input class="title-name" type="text" placeholder="Enter Title Name" />
+      </div>
+      <div class="add-title-author">
+        <h4 data-trans="author-name">Author:</h4>
+        <input class="author-name" type="text" placeholder="Enter Author Name" />
+      </div>
+      <button data-trans="add-manually" class="add-manually-btn" onclick="onAddManually()">Add</button>
+    </section>
+    <script src="js/util.service.js"></script>
+    <script src="js/storage-service.js"></script>
+    <script src="js/translate-service.js"></script>
+    <script src="js/book-service.js"></script>
+    <script src="js/book-controller.js"></script>
   </body>
 </html>
